@@ -10,3 +10,6 @@ class Gallina(models.Model):
     raza = models.CharField(max_length=100)
 
 class
+
+
+
