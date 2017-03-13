@@ -38,12 +38,12 @@ class EventoGalponAdmin (admin.ModelAdmin):
     fields = ( "descripcion", "fecha", "galpon")
 
 class LoteAdmin(admin.ModelAdmin):
-    list_display = ("id", "codigo", "cantidad_gallinas", "fecha_nacimiento_gallinas", "galpon")
-    fields = ( "codigo", "cantidad_gallinas", "fecha_nacimiento_gallinas", "galpon")
+    list_display = ("id", "codigo", "cantidad_gallinas", "fecha_nacimiento_gallinas")
+    fields = ( "codigo", "cantidad_gallinas", "fecha_nacimiento_gallinas" )
 
 class GallinaAdmin(admin.ModelAdmin):
-    list_display = ("id", "edad", "raza", "fecha_nacimiento", "novedad", "proceso", "lote")
-    fields = ( "edad", "raza", "fecha_nacimiento", "novedad", "proceso", "lote")
+    list_display = ("id", "codigo", "raza", "fecha_nacimiento", "proceso", "galpon", "lote", "edad_dias","edad_semanas")
+    fields = ( "raza", "codigo", "fecha_nacimiento",  "proceso", "galpon", "lote" )
 
 class TratamientoAdmin(admin.ModelAdmin):
     list_display = ("id", "descripcion", "gallina", "fecha")

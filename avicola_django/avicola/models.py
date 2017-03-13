@@ -120,7 +120,6 @@ class Lote(models.Model):
     codigo = models.IntegerField(unique=True)
     cantidad_gallinas = models.IntegerField()
     fecha_nacimiento_gallinas = models.DateField()
-    galpon = models.ForeignKey(Galpon)
 
     def __unicode__(self):
         return str(self.id)
@@ -128,18 +127,26 @@ class Lote(models.Model):
 class Gallina(models.Model):
     id = models.IntegerField(primary_key=True)
     codigo = models.IntegerField(unique=True)
-    edad = models.IntegerField(help_text="Ingrese la edad en dias")
     raza = models.CharField(max_length=100, null=False, choices = RAZAS_GALLINAS)
     fecha_nacimiento = models.DateField()
-    novedad  = models.CharField(max_length=100, null=True, blank=True)
     proceso  = models.CharField(max_length=100, null=True, blank=True)
+    galpon = models.ForeignKey(Galpon)
     lote = models.ForeignKey(Lote)
+
 
     def __unicode__(self):
         return str(self.id)
 
-    def edad_semanas (self):
-        return self.edad/7
+    def edad_semanas(self):
+        return round(self.calcular_edad_dias()/7.0, 2)
+
+    def edad_dias(self):
+        return self.calcular_edad_dias()
+
+    def calcular_edad_dias(self):
+        import datetime
+        edad_dias = (datetime.date.today()-self.fecha_nacimiento).days
+        return edad_dias
 
 class Tratamiento (models.Model):
     id = models.IntegerField(primary_key=True)
