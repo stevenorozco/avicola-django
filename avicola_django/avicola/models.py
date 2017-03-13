@@ -12,12 +12,22 @@ TIPOS_AREAS = (
     ("produccion" , "Produccion"),
 )
 
+TIPOS_ZONAS = (
+    ("productiva" , "Productiva"),
+    ("levante" , "Levante"),
+)
+
 NIVELES_PROFESIONALES = (
     ("tecnico" , "Tecnico"),
     ("tecnologo" , "Tecnologo"),
     ("profesional" , "Profesional"),
     ("maestria" , "Maestria"),
     ("doctorado" , "Doctorado"),
+)
+
+TIPO_VETERINARIO = (
+    ("experto" , "Experto"),
+    ("auxiliar" , "Auxiliar"),
 )
 # Create your models here.
 
@@ -33,6 +43,7 @@ class Area (models.Model):
     tipo = models.CharField(max_length=40, choices=TIPOS_AREAS)
     nombre = models.CharField(max_length=30)
     empresa = models.ForeignKey(Empresa)
+    beneficio_cooperativa = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.nombre
@@ -47,6 +58,7 @@ class Cargo (models.Model):
 
 class Empleado(models.Model):
     id = models.IntegerField(primary_key=True)
+    cedula = models.IntegerField(unique=True)
     nombre = models.CharField(max_length=100)
     tel = models.IntegerField(null=True, blank=True)
     cargo = models.ForeignKey(Cargo)
@@ -58,6 +70,7 @@ class Empleado(models.Model):
 
 class Veterinario(models.Model):
     id = models.IntegerField(primary_key=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_VETERINARIO)
     experiencia = models.IntegerField()
     empleado = models.ForeignKey(Empleado)
 
@@ -69,7 +82,8 @@ class Curso (models.Model):
     nombre = models.CharField(max_length=100)
     titulo = models.CharField(max_length=100)
     institucion =models.CharField(max_length=100)
-    fecha = models.DateTimeField()
+    fecha = models.DateField()
+    intensidad_horaria = models.IntegerField(help_text="Cantidad de horas")
     veterinario = models.ForeignKey(Veterinario)
 
     def __unicode__(self):
@@ -77,8 +91,9 @@ class Curso (models.Model):
 
 class Granja(models.Model):
     id= models.IntegerField(primary_key=True)
-    cantGallinas = models.IntegerField()
+    capacidad_max_gallinas = models.IntegerField()
     area = models.ForeignKey(Area)
+    jefe = models.ForeignKey(Empleado)
 
     def __unicode__(self):
         return str(self.id)
@@ -86,16 +101,25 @@ class Granja(models.Model):
 class Galpon(models.Model):
     id = models.IntegerField(primary_key=True)
     codigo = models.IntegerField()
-    eventos = models.CharField(max_length=100, null=True, blank=True)
-    capacidad = models.IntegerField()
+    tipo_zona = models.CharField(max_length=30, choices=TIPOS_ZONAS)
+    capacidad_max_gallinas = models.IntegerField()
     granja = models.ForeignKey(Granja)
+    responsable = models.ForeignKey(Empleado)
 
     def __unicode__(self):
         return str(self.codigo)
 
+class EventoGalpon (models.Model):
+    id = models.IntegerField(primary_key=True)
+    descripcion = models.TextField()
+    fecha = models.DateTimeField()
+    galpon = models.ForeignKey(Galpon)
+
 class Lote(models.Model):
     id = models.IntegerField(primary_key=True)
-    cantidadGallinas = models.IntegerField()
+    codigo = models.IntegerField(unique=True)
+    cantidad_gallinas = models.IntegerField()
+    fecha_nacimiento_gallinas = models.DateField()
     galpon = models.ForeignKey(Galpon)
 
     def __unicode__(self):
@@ -103,14 +127,19 @@ class Lote(models.Model):
 
 class Gallina(models.Model):
     id = models.IntegerField(primary_key=True)
+    codigo = models.IntegerField(unique=True)
     edad = models.IntegerField(help_text="Ingrese la edad en dias")
     raza = models.CharField(max_length=100, null=False, choices = RAZAS_GALLINAS)
+    fecha_nacimiento = models.DateField()
     novedad  = models.CharField(max_length=100, null=True, blank=True)
     proceso  = models.CharField(max_length=100, null=True, blank=True)
     lote = models.ForeignKey(Lote)
 
     def __unicode__(self):
         return str(self.id)
+
+    def edad_semanas (self):
+        return self.edad/7
 
 class Tratamiento (models.Model):
     id = models.IntegerField(primary_key=True)
